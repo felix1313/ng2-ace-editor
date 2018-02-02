@@ -1,9 +1,10 @@
-import { Directive, EventEmitter, Output, ElementRef, Input } from "@angular/core";
+import { Directive, EventEmitter, Output, ElementRef, Input, NgZone } from "@angular/core";
 import "brace";
 import "brace/theme/monokai";
 import "brace/mode/html";
 var AceEditorDirective = (function () {
-    function AceEditorDirective(elementRef) {
+    function AceEditorDirective(elementRef, zone) {
+        this.zone = zone;
         this.textChanged = new EventEmitter();
         this.textChange = new EventEmitter();
         this._options = {};
@@ -14,7 +15,10 @@ var AceEditorDirective = (function () {
         this._durationBeforeCallback = 0;
         this._text = "";
         var el = elementRef.nativeElement;
-        this.editor = ace["edit"](el);
+        var that = this;
+        this.zone.runOutsideAngular(function () {
+            that.editor = ace["edit"](el);
+        });
         this.editor.$blockScrolling = Infinity;
     }
     AceEditorDirective.prototype.ngOnInit = function () {
@@ -149,6 +153,7 @@ var AceEditorDirective = (function () {
     /** @nocollapse */
     AceEditorDirective.ctorParameters = function () { return [
         { type: ElementRef, },
+        { type: NgZone, },
     ]; };
     AceEditorDirective.propDecorators = {
         "textChanged": [{ type: Output },],

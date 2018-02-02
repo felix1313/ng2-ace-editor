@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, ElementRef, Input, forwardRef, OnInit} from "@angular/core";
+import {Component, EventEmitter, Output, ElementRef, Input, forwardRef, OnInit, NgZone} from "@angular/core";
 import {NG_VALUE_ACCESSOR, ControlValueAccessor} from "@angular/forms";
 import "brace";
 import "brace/theme/monokai";
@@ -31,9 +31,13 @@ export class AceEditorComponent implements ControlValueAccessor, OnInit {
     oldText: any;
     timeoutSaving: any;
 
-    constructor(elementRef: ElementRef) {
+    constructor(elementRef: ElementRef, private zone: NgZone) {
         let el = elementRef.nativeElement;
-        this._editor = ace["edit"](el);
+        let that = this;
+        this.zone.runOutsideAngular(()=>{
+            that._editor = ace["edit"](el);
+        });
+
         this._editor.$blockScrolling = Infinity;
     }
 

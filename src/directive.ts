@@ -1,4 +1,4 @@
-import {Directive, EventEmitter, Output, ElementRef, Input, OnInit} from "@angular/core";
+import {Directive, EventEmitter, Output, ElementRef, Input, OnInit, NgZone} from "@angular/core";
 import "brace";
 import "brace/theme/monokai";
 import "brace/mode/html";
@@ -22,9 +22,13 @@ export class AceEditorDirective implements OnInit {
     oldText: any;
     timeoutSaving: any;
 
-    constructor(elementRef: ElementRef) {
+    constructor(elementRef: ElementRef, private zone: NgZone) {
         let el = elementRef.nativeElement;
-        this.editor = ace["edit"](el);
+        let that = this;
+        this.zone.runOutsideAngular(()=>{
+            that.editor = ace["edit"](el);
+        });
+        
         this.editor.$blockScrolling = Infinity;
     }
 

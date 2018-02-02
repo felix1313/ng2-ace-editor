@@ -5,7 +5,8 @@
 }(this, (function (exports,core,brace,monokai,html,forms) { 'use strict';
 
 var AceEditorDirective = (function () {
-    function AceEditorDirective(elementRef) {
+    function AceEditorDirective(elementRef, zone) {
+        this.zone = zone;
         this.textChanged = new core.EventEmitter();
         this.textChange = new core.EventEmitter();
         this._options = {};
@@ -16,7 +17,10 @@ var AceEditorDirective = (function () {
         this._durationBeforeCallback = 0;
         this._text = "";
         var el = elementRef.nativeElement;
-        this.editor = ace["edit"](el);
+        var that = this;
+        this.zone.runOutsideAngular(function () {
+            that.editor = ace["edit"](el);
+        });
         this.editor.$blockScrolling = Infinity;
     }
     AceEditorDirective.prototype.ngOnInit = function () {
@@ -151,6 +155,7 @@ var AceEditorDirective = (function () {
     /** @nocollapse */
     AceEditorDirective.ctorParameters = function () { return [
         { type: core.ElementRef, },
+        { type: core.NgZone, },
     ]; };
     AceEditorDirective.propDecorators = {
         "textChanged": [{ type: core.Output },],
@@ -167,7 +172,8 @@ var AceEditorDirective = (function () {
 }());
 
 var AceEditorComponent = (function () {
-    function AceEditorComponent(elementRef) {
+    function AceEditorComponent(elementRef, zone) {
+        this.zone = zone;
         this.textChanged = new core.EventEmitter();
         this.textChange = new core.EventEmitter();
         this.style = {};
@@ -183,7 +189,10 @@ var AceEditorComponent = (function () {
         this._onTouched = function () {
         };
         var el = elementRef.nativeElement;
-        this._editor = ace["edit"](el);
+        var that = this;
+        this.zone.runOutsideAngular(function () {
+            that._editor = ace["edit"](el);
+        });
         this._editor.$blockScrolling = Infinity;
     }
     AceEditorComponent.prototype.ngOnInit = function () {
@@ -352,6 +361,7 @@ var AceEditorComponent = (function () {
     /** @nocollapse */
     AceEditorComponent.ctorParameters = function () { return [
         { type: core.ElementRef, },
+        { type: core.NgZone, },
     ]; };
     AceEditorComponent.propDecorators = {
         "textChanged": [{ type: core.Output },],

@@ -1,10 +1,11 @@
-import { Component, EventEmitter, Output, ElementRef, Input, forwardRef } from "@angular/core";
+import { Component, EventEmitter, Output, ElementRef, Input, forwardRef, NgZone } from "@angular/core";
 import { NG_VALUE_ACCESSOR } from "@angular/forms";
 import "brace";
 import "brace/theme/monokai";
 import "brace/mode/html";
 var AceEditorComponent = (function () {
-    function AceEditorComponent(elementRef) {
+    function AceEditorComponent(elementRef, zone) {
+        this.zone = zone;
         this.textChanged = new EventEmitter();
         this.textChange = new EventEmitter();
         this.style = {};
@@ -20,7 +21,10 @@ var AceEditorComponent = (function () {
         this._onTouched = function () {
         };
         var el = elementRef.nativeElement;
-        this._editor = ace["edit"](el);
+        var that = this;
+        this.zone.runOutsideAngular(function () {
+            that._editor = ace["edit"](el);
+        });
         this._editor.$blockScrolling = Infinity;
     }
     AceEditorComponent.prototype.ngOnInit = function () {
@@ -189,6 +193,7 @@ var AceEditorComponent = (function () {
     /** @nocollapse */
     AceEditorComponent.ctorParameters = function () { return [
         { type: ElementRef, },
+        { type: NgZone, },
     ]; };
     AceEditorComponent.propDecorators = {
         "textChanged": [{ type: Output },],
